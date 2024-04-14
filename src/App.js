@@ -5,6 +5,7 @@ import Offers from "./pages/Offers";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import Header from "./components/Header";
+import ForgotPassword from "./pages/ForgotPassword";
 function App() {
   return (
     <>
@@ -16,6 +17,7 @@ function App() {
           <Route path="/sign-in" element={<SignIn />} />
           <Route path="/sign-up" element={<SignUp />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/ForgotPassword" element={<ForgotPassword />} />
         </Routes>
       </Router>
     </>
