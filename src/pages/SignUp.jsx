@@ -1,10 +1,19 @@
-import React from "react";
 import { useState } from "react";
 import { AiFillEyeInvisible, AiFillEye } from "react-icons/ai";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import OAuth from "../components/OAuth";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
+import { app, db } from "../Firebase";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
-const SignUp = () => {
+const auth = getAuth(app);
+export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -19,7 +28,32 @@ const SignUp = () => {
       [e.target.id]: e.target.value,
     }));
   }
+  async function onSubmit(e) {
+    e.preventDefault();
 
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      updateProfile(auth.currentUser, {
+        displayName: name,
+      });
+      const user = userCredential.user;
+      const formDataCopy = { ...formData };
+      delete formDataCopy.password;
+      formDataCopy.timestamp = serverTimestamp();
+
+      await setDoc(doc(db, "users", user.uid), formDataCopy);
+      // console.log("Sign up was successful");
+      toast.success("Sign up was successful");
+      navigate("/");
+    } catch (error) {
+      toast.error("Something went wrong with the registration");
+    }
+  }
   return (
     <section>
       <h1 className="mt-6 text-3xl font-bold text-center">Sign Up</h1>
@@ -32,13 +66,13 @@ const SignUp = () => {
           />
         </div>
         <div className="w-full md:w-[67%] lg:w-[40%] lg:ml-20">
-          <form>
+          <form onSubmit={onSubmit}>
             <input
               type="text"
               id="name"
               value={name}
               onChange={onChange}
-              placeholder="Full Name"
+              placeholder="Full name"
               className="w-full px-4 py-2 mb-6 text-xl text-gray-700 transition ease-in-out bg-white border-gray-300 rounded"
             />
             <input
@@ -77,7 +111,7 @@ const SignUp = () => {
                   to="/sign-in"
                   className="ml-1 text-red-600 transition duration-200 ease-in-out hover:text-red-700"
                 >
-                  Sign In
+                  Sign in
                 </Link>
               </p>
               <p>
@@ -93,18 +127,15 @@ const SignUp = () => {
               className="w-full py-3 text-sm font-medium text-white uppercase transition duration-150 ease-in-out bg-blue-600 rounded shadow-md px-7 hover:bg-blue-700 hover:shadow-lg active:bg-blue-800"
               type="submit"
             >
-              Sign Up
+              Sign up
             </button>
             <div className="flex items-center my-4 before:border-t before:flex-1 before:border-gray-300 after:border-t after:flex-1 after:border-gray-300">
               <p className="mx-4 font-semibold text-center">OR</p>
             </div>
+            <OAuth />
           </form>
-
-          <OAuth />
         </div>
       </div>
     </section>
   );
-};
-
-export default SignUp;
+}
