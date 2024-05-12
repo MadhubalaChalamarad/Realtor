@@ -1,16 +1,29 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-
+import { app } from "../Firebase";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 const Header = () => {
+  const auth = getAuth(app);
+  const [pageState, setPageState] = useState("Sign in");
   const location = useLocation();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setPageState("profile");
+      } else {
+        setPageState("Sign in");
+      }
+    });
+  }, [auth]);
 
   function pathMatchRoute(route) {
     return route === location.pathname;
   }
 
   return (
-    <div className="sticky top-0 z-50 bg-white border-b shadow-lg cursor-pointer">
+    <div className="sticky top-0 z-40 bg-white border-b shadow-lg cursor-pointer">
       <div className="flex justify-between max-w-6xl py-3 mx-auto cursor-pointer">
         <div>
           <img
@@ -50,15 +63,15 @@ const Header = () => {
             </li>
             <li
               className={
-                pathMatchRoute("/sign-in")
+                pathMatchRoute("/sign-in") || pathMatchRoute("/profile")
                   ? "border-b-[3px] border-red-500 font-semibold"
                   : "text-gray-500 font-semibold border-b-[3px] border-b-transparent"
               }
               onClick={() => {
-                navigate("/sign-in");
+                navigate("/profile");
               }}
             >
-              Sign In
+              {pageState}
             </li>
           </ul>
         </div>
