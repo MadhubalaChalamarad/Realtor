@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { app, db } from "../Firebase";
 import { getAuth, updateProfile } from "firebase/auth";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { doc } from "firebase/firestore/lite";
 import { updateDoc, getDoc } from "firebase/firestore";
+import { FcHome } from "react-icons/fc";
 
 const Profile = () => {
   const auth = getAuth(app);
@@ -48,7 +49,7 @@ const Profile = () => {
       }
       toast("Profile update successfully");
     } catch (error) {
-      toast.error("Colud not update the profile details");
+      toast.error("Could not update the profile details");
     }
   };
   return (
@@ -100,6 +101,18 @@ const Profile = () => {
               </p>
             </div>
           </form>
+          <button
+            type="submit"
+            className="flex items-center justify-center w-full p-2 font-medium text-center text-white transition duration-150 ease-in-out bg-blue-600 rounded-md text-md hover:bg-blue-700 hover:shadow-lg"
+          >
+            <Link
+              to="/create-listing"
+              className="flex items-center justify-center gap-2 "
+            >
+              <FcHome className="p-1 text-3xl bg-orange-400 border-2 rounded-full font-md" />
+              Sell or rent your home
+            </Link>
+          </button>
         </div>
       </section>
     </>
